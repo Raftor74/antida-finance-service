@@ -9,10 +9,12 @@ CREATE TABLE IF NOT EXISTS "account" (
 
 CREATE TABLE IF NOT EXISTS "category" (
 "id" 		      INTEGER PRIMARY KEY AUTOINCREMENT,
-"name"            TEXT    NOT NULL UNIQUE,
-"parent_id"       TEXT    ,
+"name"            TEXT    NOT NULL,
+"parent_id"       INTEGER,
 "account_id"      INTEGER NOT NULL,
-FOREIGN KEY("account_id" ) REFERENCES "account"("id") ON DELETE CASCADE
+FOREIGN KEY("account_id") REFERENCES "account"("id") ON DELETE CASCADE
+FOREIGN KEY("parent_id") REFERENCES "category"("id") ON DELETE CASCADE
+CONSTRAINT UC_Category UNIQUE (account_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS "transaction" (
@@ -20,10 +22,10 @@ CREATE TABLE IF NOT EXISTS "transaction" (
 "type"         INTEGER NOT NULL,
 "sum"          INTEGER NOT NULL,
 "description"  TEXT    ,
-"date_time"    INTEGER ,
+"date_time"    INTEGER NOT NULL,
 "category_id"  INTEGER ,
 "account_id"   INTEGER NOT NULL,
-FOREIGN KEY("category_id")  REFERENCES "category"("id") ON DELETE SET NULL,
+FOREIGN KEY("category_id") REFERENCES "category"("id") ON DELETE SET NULL,
 FOREIGN KEY("account_id") REFERENCES "account"("id") ON DELETE CASCADE
 );
 COMMIT;
