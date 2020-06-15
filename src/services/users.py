@@ -18,7 +18,7 @@ class UserService:
         try:
             return self._create_user(attributes)
         except IntegrityError as e:
-            raise EmailAlreadyExist(str(e))
+            raise EmailAlreadyExist(str(e)) from e
 
     def get_user(self, id):
         return self.model.get_by_id(id)
