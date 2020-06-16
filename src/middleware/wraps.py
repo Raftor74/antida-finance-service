@@ -2,6 +2,8 @@ from functools import wraps
 from flask import request
 from marshmallow.validate import ValidationError
 
+from builders import ServiceBuilder
+from services.auth import AuthService
 from utils.response import json_response
 
 
@@ -19,3 +21,18 @@ def validate(schema):
         return wrapper
 
     return decorator
+
+
+def auth_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        auth_service = ServiceBuilder(AuthService).build()
+        user_id = auth_service.get_auth_user_id()
+        if user_id is None:
+            return json_response.unauthorized()
+        user = auth_service.get_user_by_id(user_id)
+        if user is None:
+            return json_response.unauthorized()
+        return view_func(*args, **kwargs, user=user)
+
+    return wrapper
