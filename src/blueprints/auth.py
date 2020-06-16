@@ -10,7 +10,6 @@ bp = Blueprint('auth', __name__)
 
 
 class LoginView(AuthServiceView):
-    service_class = AuthService
 
     @validate(schema=login_form)
     def post(self, form):
@@ -23,7 +22,6 @@ class LoginView(AuthServiceView):
 
 
 class LogoutView(AuthServiceView):
-    service_class = AuthService
 
     def post(self):
         self.service.logout()
