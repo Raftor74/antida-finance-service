@@ -1,21 +1,16 @@
 from flask import Blueprint
-from flask.views import MethodView
 
-from utils.database import db
-from utils.response import json_response
-from services.users import UserService, EmailAlreadyExist
-from middleware.wraps import validate
 from forms import register_form
+from middleware.wraps import validate
+from services.users import EmailAlreadyExist
+from utils.response import json_response
+from views import UserServiceView
 
 bp = Blueprint('users', __name__)
 
 
-class BaseView(MethodView):
-    def __init__(self):
-        self.service = UserService(db.connection)
+class UsersView(UserServiceView):
 
-
-class UsersView(BaseView):
     @validate(schema=register_form)
     def post(self, form):
         try:

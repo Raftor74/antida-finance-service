@@ -41,7 +41,7 @@ class BaseModel:
             return cursor.lastrowid
 
         except sqlite3.IntegrityError as e:
-            raise IntegrityError(str(e))
+            raise IntegrityError(str(e)) from e
 
 
 class User(BaseModel):
