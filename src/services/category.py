@@ -25,7 +25,7 @@ class CategoryService:
     def create(self, user_id, name, parent_id=None):
         fields = self._make_category_fields(user_id, name, parent_id)
         try:
-            return self.model.create(fields)
+            return self._create_category(fields)
         except IntegrityError as e:
             raise ParentCategoryNotFound(str(e)) from e
 
