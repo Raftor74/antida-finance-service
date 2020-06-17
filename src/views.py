@@ -2,6 +2,7 @@ from flask.views import MethodView
 from builders import ServiceBuilder
 from services.auth import AuthService
 from services.users import UserService
+from services.category import CategoryService
 
 
 class ServiceView(MethodView):
@@ -17,3 +18,7 @@ class AuthServiceView(ServiceView):
 
 class UserServiceView(ServiceView):
     service_class = UserService
+
+
+class CategoryServiceView(ServiceView):
+    service_class = CategoryService
