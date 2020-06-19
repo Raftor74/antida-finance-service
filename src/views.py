@@ -3,7 +3,6 @@ from builders import ServiceBuilder
 from services.auth import AuthService
 from services.users import UserService
 from services.category import CategoryService
-# from services.transaction import TransactionService
 
 
 class ServiceView(MethodView):
@@ -23,7 +22,3 @@ class UserServiceView(ServiceView):
 
 class CategoryServiceView(ServiceView):
     service_class = CategoryService
-
-
-# class TransactionServiceView(ServiceView):
-#     service_class = TransactionService
