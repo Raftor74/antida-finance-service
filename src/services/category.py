@@ -10,10 +10,6 @@ class CategoryNotFound(CategoryServiceError):
     pass
 
 
-class ParentCategoryNotFound(CategoryServiceError):
-    pass
-
-
 class CategoryAlreadyExist(CategoryServiceError):
     pass
 
@@ -24,10 +20,7 @@ class CategoryService:
 
     def create(self, user_id, name, parent_id=None):
         fields = self._make_category_fields(user_id, name, parent_id)
-        try:
-            return self._create_category(fields)
-        except IntegrityError as e:
-            raise ParentCategoryNotFound(str(e)) from e
+        return self._create_category(fields)
 
     def get_user_category_by_name(self, user_id, name):
         name = str(name).lower()
@@ -45,6 +38,20 @@ class CategoryService:
     def get_user_categories(self, user_id):
         return self.model.get_categories_by_user(user_id)
 
+    def update_category(self, category_id, attributes: dict):
+        try:
+            return self._update_category(category_id, attributes)
+        except IntegrityError as e:
+            raise CategoryAlreadyExist(str(e)) from e
+
+    def delete_category(self, category_id):
+        return self.model.delete(category_id)
+
+    def _update_category(self, category_id, attributes: dict):
+        if "name" in attributes:
+            attributes['name'] = str(attributes['name']).lower()
+        return self.model.update(category_id, attributes)
+
     def _create_category(self, attributes: dict):
         attributes['name'] = str(attributes['name']).lower()
         return self.model.create(attributes)
@@ -52,5 +59,5 @@ class CategoryService:
     def _make_category_fields(self, user_id, name, parent_id=None):
         fields = {"name": name, "account_id": user_id}
         if parent_id is not None:
-            fields['parent_id'] = parent_id
+            fields["parent_id"] = parent_id
         return fields
