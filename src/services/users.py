@@ -1,5 +1,7 @@
+from .base import ModelService, SchemaService
 from exceptions import ServiceError
 from models import User, IntegrityError
+from schemes import UserSchema
 
 
 class UserServiceError(ServiceError):
@@ -10,9 +12,9 @@ class EmailAlreadyExist(UserServiceError):
     pass
 
 
-class UserService:
-    def __init__(self, connection):
-        self.model = User(connection)
+class UserService(ModelService, SchemaService):
+    model_class = User
+    schema_class = UserSchema
 
     def register(self, attributes: dict):
         try:
@@ -20,8 +22,8 @@ class UserService:
         except IntegrityError as e:
             raise EmailAlreadyExist(str(e)) from e
 
-    def get_user(self, id):
-        return self.model.get_by_id(id)
+    def get_user_by_id(self, user_id):
+        return self.model.get_by_id(user_id)
 
     def _generate_user_password(self, password):
         return self.model.generate_password_hash(password)
