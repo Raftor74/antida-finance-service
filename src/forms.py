@@ -36,7 +36,7 @@ class UpdateCategoryForm(CreateCategoryForm):
     name = fields.String()
 
 
-class TransactionForm(Schema):
+class CreateTransactionForm(Schema):
     type = fields.Integer(required=True)
     sum = fields.Float(required=True)
     description = fields.String()
@@ -59,8 +59,14 @@ class TransactionForm(Schema):
             raise ValidationError("Передан не верный тип транзакции")
 
 
+class UpdateTransactionForm(CreateTransactionForm):
+    type = fields.Integer()
+    sum = fields.Float()
+
+
 register_form = RegisterForm(unknown=EXCLUDE)
 login_form = LoginForm(unknown=EXCLUDE)
 create_category_form = CreateCategoryForm(unknown=EXCLUDE)
 update_category_form = UpdateCategoryForm(unknown=EXCLUDE)
-transaction_form = TransactionForm(unknown=EXCLUDE)
+create_transaction_form = CreateTransactionForm(unknown=EXCLUDE)
+update_transaction_form = UpdateTransactionForm(unknown=EXCLUDE)

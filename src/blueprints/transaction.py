@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from forms import transaction_form
+from forms import create_transaction_form, update_transaction_form
 from middleware.wraps import validate, auth_required
 from services.transaction import TransactionNotFound
 from utils.response import json_response
@@ -11,7 +11,7 @@ bp = Blueprint('transaction', __name__)
 
 class TransactionsView(TransactionServiceView):
     @auth_required
-    @validate(schema=transaction_form)
+    @validate(schema=create_transaction_form)
     def post(self, form, user):
         user_id = user.pop("id", None)
         transaction_id = self.service.create(user_id, form)
@@ -43,7 +43,7 @@ class TransactionView(TransactionServiceView):
             return json_response.success(response)
 
     @auth_required
-    @validate(schema=transaction_form)
+    @validate(schema=update_transaction_form)
     def patch(self, transaction_id, user, form):
         user_id = user.pop("id", None)
         try:
