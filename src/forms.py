@@ -1,7 +1,10 @@
 from marshmallow import Schema, fields, validate, EXCLUDE, validates, ValidationError
-from builders import ServiceBuilder
-from services.auth import AuthService
-from services.category import CategoryService, CategoryNotFound
+from utils.auth import get_auth_user_id
+from utils.validation import (
+    ValidationError as CustomValidationError,
+    is_category_owner,
+    is_valid_transaction_type
+)
 
 
 class RegisterForm(Schema):
@@ -22,12 +25,10 @@ class CreateCategoryForm(Schema):
 
     @validates("parent_id")
     def validate_parent_id(self, value):
-        auth_service = ServiceBuilder(AuthService).build()
-        category_service = ServiceBuilder(CategoryService).build()
-        user_id = auth_service.get_auth_user_id()
         try:
-            category_service.get_user_category_by_id(user_id, value)
-        except CategoryNotFound:
+            user_id = get_auth_user_id()
+            is_category_owner(user_id, value)
+        except CustomValidationError:
             raise ValidationError("Родительская категория не найдена")
 
 
@@ -35,7 +36,37 @@ class UpdateCategoryForm(CreateCategoryForm):
     name = fields.String()
 
 
+class CreateTransactionForm(Schema):
+    type = fields.Integer(required=True)
+    sum = fields.Float(required=True)
+    description = fields.String()
+    category_id = fields.Integer()
+    date_time = fields.DateTime()
+
+    @validates("category_id")
+    def validate_category_id(self, value):
+        try:
+            user_id = get_auth_user_id()
+            is_category_owner(user_id, value)
+        except CustomValidationError:
+            raise ValidationError("Категория не найдена")
+
+    @validates("type")
+    def validate_type(self, value):
+        try:
+            is_valid_transaction_type(value)
+        except CustomValidationError:
+            raise ValidationError("Передан не верный тип транзакции")
+
+
+class UpdateTransactionForm(CreateTransactionForm):
+    type = fields.Integer()
+    sum = fields.Float()
+
+
 register_form = RegisterForm(unknown=EXCLUDE)
 login_form = LoginForm(unknown=EXCLUDE)
 create_category_form = CreateCategoryForm(unknown=EXCLUDE)
 update_category_form = UpdateCategoryForm(unknown=EXCLUDE)
+create_transaction_form = CreateTransactionForm(unknown=EXCLUDE)
+update_transaction_form = UpdateTransactionForm(unknown=EXCLUDE)
