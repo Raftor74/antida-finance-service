@@ -1,5 +1,6 @@
 from flask import session
 
+from .base import ModelService
 from exceptions import ServiceError
 from models import User
 
@@ -16,15 +17,8 @@ class IncorrectPassword(AuthServiceError):
     pass
 
 
-class AuthService:
-    def __init__(self, connection):
-        self.model = User(connection)
-
-    def get_user_by_id(self, user_id):
-        return self.model.get_by_id(user_id)
-
-    def get_auth_user_id(self):
-        return session.get('user_id')
+class AuthService(ModelService):
+    model_class = User
 
     def auth(self, email, password):
         user = self.model.get_by_email(email)
@@ -39,6 +33,10 @@ class AuthService:
     @classmethod
     def logout(cls):
         session.pop('user_id', None)
+
+    @classmethod
+    def get_auth_user_id(cls):
+        return session.get('user_id')
 
     def _check_user_password(self, user, password):
         return self.model.check_password_hash(user['password'], password)

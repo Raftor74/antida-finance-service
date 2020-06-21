@@ -15,12 +15,12 @@ class UsersView(UserServiceView):
     def post(self, form):
         try:
             user_id = self.service.register(form)
-            user = self.service.get_user(user_id)
-            user.pop('password')
+            user = self.service.get_user_by_id(user_id)
+            response = self.service.to_response(user)
         except EmailAlreadyExist:
             return json_response.conflict()
         else:
-            return json_response.success(user)
+            return json_response.success(response)
 
 
 bp.add_url_rule('', view_func=UsersView.as_view('users'))
