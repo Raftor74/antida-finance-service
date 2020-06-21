@@ -1,5 +1,7 @@
+from .base import ModelService, SchemaService
 from exceptions import ServiceError
 from models import Category, IntegrityError
+from schemes import CategorySchema
 
 
 class CategoryServiceError(ServiceError):
@@ -14,9 +16,9 @@ class CategoryAlreadyExist(CategoryServiceError):
     pass
 
 
-class CategoryService:
-    def __init__(self, connection):
-        self.model = Category(connection)
+class CategoryService(ModelService, SchemaService):
+    model_class = Category
+    schema_class = CategorySchema
 
     def create(self, user_id, name, parent_id=None):
         fields = self._make_category_fields(user_id, name, parent_id)

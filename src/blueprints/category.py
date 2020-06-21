@@ -16,13 +16,18 @@ class CategoriesView(CategoryServiceView):
         user_id = user.pop("id", None)
         self.service.create(user_id, **form)
         category = self.service.get_user_category_by_name(user_id, form['name'])
-        return json_response.success(category)
+        response = self.service.to_response(category)
+        return json_response.success(response)
 
     @auth_required
     def get(self, user):
         user_id = user.pop("id", None)
         categories = self.service.get_user_categories(user_id)
-        return json_response.success(categories)
+        response = [
+            self.service.to_response(category)
+            for category in categories
+        ]
+        return json_response.success(response)
 
 
 class CategoryView(CategoryServiceView):
