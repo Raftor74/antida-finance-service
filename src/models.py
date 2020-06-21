@@ -17,7 +17,7 @@ class BaseModel:
     def get_by_field(self, field_name, value):
         query = f"""
             SELECT *
-            FROM {self.table} 
+            FROM `{self.table}`
             WHERE {field_name} = ?
         """
         result = self.connection.execute(query, (value,)).fetchone()
@@ -40,7 +40,7 @@ class BaseModel:
         placeholder = ', '.join('?' for _ in values)
         fields_str = ', '.join(keys)
         query = f"""
-            INSERT {on_conflict} INTO {self.table} ({fields_str})
+            INSERT {on_conflict} INTO `{self.table}` ({fields_str})
             VALUES ({placeholder})
         """
         try:
@@ -56,7 +56,7 @@ class BaseModel:
         placeholder = ', '.join(f'{key} = ?' for key in fields.keys())
         values = (*fields.values(), pk)
         query = f"""
-            UPDATE {self.table} 
+            UPDATE `{self.table}` 
             SET {placeholder} 
             WHERE {pk_name} = ? 
         """
@@ -71,7 +71,7 @@ class BaseModel:
         values = (pk,)
         query = f"""
             DELETE 
-            FROM {self.table}
+            FROM `{self.table}`
             WHERE {pk_name} = ?
         """
         try:
@@ -88,7 +88,7 @@ class BaseModel:
 
         query = f"""
             SELECT *
-            FROM {self.table}
+            FROM `{self.table}`
             WHERE {placeholder}
          """
         return self.connection.execute(query, values)
@@ -126,3 +126,17 @@ class Category(BaseModel):
     def get_categories_by_user(self, user_id):
         return self.find_many({'account_id': user_id})
 
+
+class Transaction(BaseModel):
+    table = "transaction"
+    TRANSACTION_TYPES = {
+        1: "Доход",
+        2: "Расход"
+    }
+
+    def get_user_transaction_by_id(self, user_id, transaction_id):
+        fields = {'id': transaction_id, "account_id": user_id}
+        return self.find_one(fields)
+
+    def get_transactions_by_user(self, user_id):
+        return self.find_many({"account_id": user_id})
