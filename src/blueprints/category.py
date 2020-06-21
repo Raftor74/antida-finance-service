@@ -16,13 +16,18 @@ class CategoriesView(CategoryServiceView):
         user_id = user.pop("id", None)
         self.service.create(user_id, **form)
         category = self.service.get_user_category_by_name(user_id, form['name'])
-        return json_response.success(category)
+        response = self.service.to_response(category)
+        return json_response.success(response)
 
     @auth_required
     def get(self, user):
         user_id = user.pop("id", None)
         categories = self.service.get_user_categories(user_id)
-        return json_response.success(categories)
+        response = [
+            self.service.to_response(category)
+            for category in categories
+        ]
+        return json_response.success(response)
 
 
 class CategoryView(CategoryServiceView):
@@ -31,10 +36,11 @@ class CategoryView(CategoryServiceView):
         try:
             user_id = user.pop("id", None)
             category = self.service.get_user_category_by_id(user_id, category_id)
+            response = self.service.to_response(category)
         except CategoryNotFound:
             return json_response.not_found()
         else:
-            return json_response.success(category)
+            return json_response.success(response)
 
     @auth_required
     @validate(schema=update_category_form)
@@ -47,10 +53,11 @@ class CategoryView(CategoryServiceView):
         try:
             self.service.update_category(category_id, form)
             category = self.service.get_user_category_by_name(user_id, form["name"])
+            response = self.service.to_response(category)
         except CategoryAlreadyExist:
             return json_response.conflict()
         else:
-            return json_response.success(category)
+            return json_response.success(response)
 
     @auth_required
     def delete(self, category_id, user):
