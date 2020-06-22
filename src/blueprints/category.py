@@ -13,7 +13,7 @@ class CategoriesView(CategoryServiceView):
     @auth_required
     @validate(schema=create_category_form)
     def post(self, form, user):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         self.service.create(user_id, **form)
         category = self.service.get_user_category_by_name(user_id, form['name'])
         response = self.service.to_response(category)
@@ -21,7 +21,7 @@ class CategoriesView(CategoryServiceView):
 
     @auth_required
     def get(self, user):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         categories = self.service.get_user_categories(user_id)
         response = [
             self.service.to_response(category)
@@ -34,7 +34,7 @@ class CategoryView(CategoryServiceView):
     @auth_required
     def get(self, category_id, user):
         try:
-            user_id = user.pop("id", None)
+            user_id = user.get("id")
             category = self.service.get_user_category_by_id(user_id, category_id)
             response = self.service.to_response(category)
         except CategoryNotFound:
@@ -45,7 +45,7 @@ class CategoryView(CategoryServiceView):
     @auth_required
     @validate(schema=update_category_form)
     def patch(self, category_id, user, form):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         try:
             self.service.get_user_category_by_id(user_id, category_id)
         except CategoryNotFound:
@@ -62,7 +62,7 @@ class CategoryView(CategoryServiceView):
     @auth_required
     def delete(self, category_id, user):
         try:
-            user_id = user.pop("id", None)
+            user_id = user.get("id")
             self.service.get_user_category_by_id(user_id, category_id)
             self.service.delete_category(category_id)
         except CategoryNotFound:
