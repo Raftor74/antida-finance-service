@@ -39,7 +39,8 @@ class TransactionService(ModelService, SchemaService):
         return self.model.delete(transaction_id)
 
     def _update_transaction(self, transaction_id, attributes: dict):
-        attributes["sum"] = self._sum_to_pennies(attributes["sum"])
+        if "sum" in attributes:
+            attributes["sum"] = self._sum_to_pennies(attributes["sum"])
         return self.model.update(transaction_id, attributes)
 
     def get_user_transactions(self, user_id):
