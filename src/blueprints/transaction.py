@@ -13,7 +13,7 @@ class TransactionsView(TransactionServiceView):
     @auth_required
     @validate(schema=create_transaction_form)
     def post(self, form, user):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         transaction_id = self.service.create(user_id, form)
         transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
         response = self.service.to_response(transaction)
@@ -21,7 +21,7 @@ class TransactionsView(TransactionServiceView):
 
     @auth_required
     def get(self, user):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         transactions = self.service.get_user_transactions(user_id)
         response = [
             self.service.to_response(transaction)
@@ -34,7 +34,7 @@ class TransactionView(TransactionServiceView):
     @auth_required
     def get(self, transaction_id, user):
         try:
-            user_id = user.pop("id", None)
+            user_id = user.get("id")
             transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
             response = self.service.to_response(transaction)
         except TransactionNotFound:
@@ -45,7 +45,7 @@ class TransactionView(TransactionServiceView):
     @auth_required
     @validate(schema=update_transaction_form)
     def patch(self, transaction_id, user, form):
-        user_id = user.pop("id", None)
+        user_id = user.get("id")
         try:
             self.service.get_user_transaction_by_id(user_id, transaction_id)
         except TransactionNotFound:
@@ -59,7 +59,7 @@ class TransactionView(TransactionServiceView):
     @auth_required
     def delete(self, transaction_id, user):
         try:
-            user_id = user.pop("id", None)
+            user_id = user.get("id")
             self.service.get_user_transaction_by_id(user_id, transaction_id)
             self.service.delete_transaction(transaction_id)
         except TransactionNotFound:
