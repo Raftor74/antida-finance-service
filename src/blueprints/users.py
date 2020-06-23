@@ -2,11 +2,15 @@ from flask import Blueprint
 
 from forms import register_form
 from middleware.wraps import validate
-from services.users import EmailAlreadyExist
+from services.users import UserService, EmailAlreadyExist
 from utils.response import json_response
-from views import UserServiceView
+from views import ServiceView
 
 bp = Blueprint('users', __name__)
+
+
+class UserServiceView(ServiceView):
+    service_class = UserService
 
 
 class UsersView(UserServiceView):

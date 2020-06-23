@@ -2,18 +2,22 @@ from flask import Blueprint
 
 from forms import create_transaction_form, update_transaction_form
 from middleware.wraps import validate, auth_required
-from services.transaction import TransactionNotFound
+from services.transaction import TransactionService, TransactionNotFound
 from utils.response import json_response
-from views import TransactionServiceView
+from views import ServiceView
 
 bp = Blueprint('transaction', __name__)
+
+
+class TransactionServiceView(ServiceView):
+    service_class = TransactionService
 
 
 class TransactionsView(TransactionServiceView):
     @auth_required
     @validate(schema=create_transaction_form)
     def post(self, form, user):
-        user_id = user.get("id")
+        user_id = user.get('id')
         transaction_id = self.service.create(user_id, form)
         transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
         response = self.service.to_response(transaction)
@@ -21,7 +25,7 @@ class TransactionsView(TransactionServiceView):
 
     @auth_required
     def get(self, user):
-        user_id = user.get("id")
+        user_id = user.get('id')
         transactions = self.service.get_user_transactions(user_id)
         response = [
             self.service.to_response(transaction)
@@ -34,7 +38,7 @@ class TransactionView(TransactionServiceView):
     @auth_required
     def get(self, transaction_id, user):
         try:
-            user_id = user.get("id")
+            user_id = user.get('id')
             transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
             response = self.service.to_response(transaction)
         except TransactionNotFound:
@@ -45,23 +49,21 @@ class TransactionView(TransactionServiceView):
     @auth_required
     @validate(schema=update_transaction_form)
     def patch(self, transaction_id, user, form):
-        user_id = user.get("id")
+        user_id = user.get('id')
         try:
-            self.service.get_user_transaction_by_id(user_id, transaction_id)
+            self.service.update_transaction(user_id, transaction_id, form)
+            transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
+            response = self.service.to_response(transaction)
         except TransactionNotFound:
             return json_response.not_found()
-        self.service.update_transaction(transaction_id, form)
-        transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
-        response = self.service.to_response(transaction)
-
-        return json_response.success(response)
+        else:
+            return json_response.success(response)
 
     @auth_required
     def delete(self, transaction_id, user):
         try:
-            user_id = user.get("id")
-            self.service.get_user_transaction_by_id(user_id, transaction_id)
-            self.service.delete_transaction(transaction_id)
+            user_id = user.get('id')
+            self.service.delete_transaction(user_id, transaction_id)
         except TransactionNotFound:
             return json_response.not_found()
         else:
