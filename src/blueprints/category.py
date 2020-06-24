@@ -3,14 +3,16 @@ from flask import Blueprint
 from forms import create_category_form, update_category_form
 from middleware.wraps import validate, auth_required
 from services.category import CategoryService, CategoryNotFound, CategoryAlreadyExist
+from schemes import CategorySchema
 from utils.response import json_response
-from views import ServiceView
+from views import ServiceView, SchemaView
 
 bp = Blueprint('category', __name__)
 
 
-class CategoryServiceView(ServiceView):
+class CategoryServiceView(ServiceView, SchemaView):
     service_class = CategoryService
+    schema_class = CategorySchema
 
 
 class CategoriesView(CategoryServiceView):
@@ -21,7 +23,7 @@ class CategoriesView(CategoryServiceView):
         try:
             category_id = self.service.create(user_id, **form)
             category = self.service.get_user_category_by_id(user_id, category_id)
-            response = self.service.to_response(category)
+            response = self.schema_response(category)
         except CategoryAlreadyExist:
             return json_response.conflict()
         else:
@@ -32,7 +34,7 @@ class CategoriesView(CategoryServiceView):
         user_id = user.get('id')
         categories = self.service.get_user_categories(user_id)
         response = [
-            self.service.to_response(category)
+            self.schema_response(category)
             for category in categories
         ]
         return json_response.success(response)
@@ -44,7 +46,7 @@ class CategoryView(CategoryServiceView):
         try:
             user_id = user.get('id')
             category = self.service.get_user_category_by_id(user_id, category_id)
-            response = self.service.to_response(category)
+            response = self.schema_response(category)
         except CategoryNotFound:
             return json_response.not_found()
         else:
@@ -57,7 +59,7 @@ class CategoryView(CategoryServiceView):
         try:
             self.service.update_category(category_id, user_id, form)
             category = self.service.get_user_category_by_id(user_id, category_id)
-            response = self.service.to_response(category)
+            response = self.schema_response(category)
         except CategoryAlreadyExist:
             return json_response.conflict()
         except CategoryNotFound:

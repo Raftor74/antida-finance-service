@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from forms import login_form
 from middleware.wraps import validate
-from services.auth import UserNotFound, IncorrectPassword
+from services.auth import AuthService, UserNotFound, IncorrectPassword
 from utils.response import json_response
 from views import ServiceView
 

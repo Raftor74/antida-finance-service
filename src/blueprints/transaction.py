@@ -3,14 +3,16 @@ from flask import Blueprint
 from forms import create_transaction_form, update_transaction_form
 from middleware.wraps import validate, auth_required
 from services.transaction import TransactionService, TransactionNotFound
+from schemes import TransactionSchema
 from utils.response import json_response
-from views import ServiceView
+from views import ServiceView, SchemaView
 
 bp = Blueprint('transaction', __name__)
 
 
-class TransactionServiceView(ServiceView):
+class TransactionServiceView(ServiceView, SchemaView):
     service_class = TransactionService
+    schema_class = TransactionSchema
 
 
 class TransactionsView(TransactionServiceView):
@@ -20,7 +22,7 @@ class TransactionsView(TransactionServiceView):
         user_id = user.get('id')
         transaction_id = self.service.create(user_id, form)
         transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
-        response = self.service.to_response(transaction)
+        response = self.schema_response(transaction)
         return json_response.success(response)
 
     @auth_required
@@ -28,7 +30,7 @@ class TransactionsView(TransactionServiceView):
         user_id = user.get('id')
         transactions = self.service.get_user_transactions(user_id)
         response = [
-            self.service.to_response(transaction)
+            self.schema_response(transaction)
             for transaction in transactions
         ]
         return json_response.success(response)
@@ -40,7 +42,7 @@ class TransactionView(TransactionServiceView):
         try:
             user_id = user.get('id')
             transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
-            response = self.service.to_response(transaction)
+            response = self.schema_response(transaction)
         except TransactionNotFound:
             return json_response.not_found()
         else:
@@ -53,7 +55,7 @@ class TransactionView(TransactionServiceView):
         try:
             self.service.update_transaction(user_id, transaction_id, form)
             transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
-            response = self.service.to_response(transaction)
+            response = self.schema_response(transaction)
         except TransactionNotFound:
             return json_response.not_found()
         else:

@@ -1,7 +1,6 @@
-from .base import ModelService, SchemaService
+from .base import ModelService
 from exceptions import ServiceError
 from models import Category, IntegrityError
-from schemes import CategorySchema
 
 
 class CategoryServiceError(ServiceError):
@@ -16,9 +15,8 @@ class CategoryAlreadyExist(CategoryServiceError):
     pass
 
 
-class CategoryService(ModelService, SchemaService):
+class CategoryService(ModelService):
     model_class = Category
-    schema_class = CategorySchema
 
     def create(self, user_id, name, parent_id=None):
         try:

@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from .base import ModelService, SchemaService
+from .base import ModelService
 from exceptions import ServiceError
 from models import Transaction
-from schemes import TransactionSchema
 
 
 class TransactionServiceError(ServiceError):
@@ -14,9 +13,8 @@ class TransactionNotFound(TransactionServiceError):
     pass
 
 
-class TransactionService(ModelService, SchemaService):
+class TransactionService(ModelService):
     model_class = Transaction
-    schema_class = TransactionSchema
 
     def create(self, user_id, fields):
         fields = self._make_transaction_fields(user_id, fields)
@@ -59,7 +57,7 @@ class TransactionService(ModelService, SchemaService):
 
     def _make_transaction_fields(self, user_id, fields):
         fields['account_id'] = user_id
-        if not 'date_time' in fields:
+        if 'date_time' not in fields:
             fields['date_time'] = datetime.now()
         fields['sum'] = self._sum_to_pennies(fields['sum'])
         return fields

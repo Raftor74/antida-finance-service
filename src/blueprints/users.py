@@ -3,14 +3,16 @@ from flask import Blueprint
 from forms import register_form
 from middleware.wraps import validate
 from services.users import UserService, EmailAlreadyExist
+from schemes import UserSchema
 from utils.response import json_response
-from views import ServiceView
+from views import ServiceView, SchemaView
 
 bp = Blueprint('users', __name__)
 
 
-class UserServiceView(ServiceView):
+class UserServiceView(SchemaView, ServiceView):
     service_class = UserService
+    schema_class = UserSchema
 
 
 class UsersView(UserServiceView):
@@ -20,7 +22,7 @@ class UsersView(UserServiceView):
         try:
             user_id = self.service.register(form)
             user = self.service.get_user_by_id(user_id)
-            response = self.service.to_response(user)
+            response = self.schema_response(user)
         except EmailAlreadyExist:
             return json_response.conflict()
         else:
