@@ -1,31 +1,32 @@
 from flask import Blueprint
-from flask.views import MethodView
 
-from utils.database import db
-from utils.response import json_response
-from services.users import UserService, EmailAlreadyExist
-from middleware.wraps import validate
 from forms import register_form
+from middleware.wraps import validate
+from services.users import UserService, EmailAlreadyExist
+from schemes import UserSchema
+from utils.response import json_response
+from views import ServiceView, SchemaView
 
 bp = Blueprint('users', __name__)
 
 
-class BaseView(MethodView):
-    def __init__(self):
-        self.service = UserService(db.connection)
+class UserServiceView(SchemaView, ServiceView):
+    service_class = UserService
+    schema_class = UserSchema
 
 
-class UsersView(BaseView):
+class UsersView(UserServiceView):
+
     @validate(schema=register_form)
     def post(self, form):
         try:
             user_id = self.service.register(form)
-            user = self.service.get_user(user_id)
-            user.pop('password')
+            user = self.service.get_user_by_id(user_id)
+            response = self.schema_response(user)
         except EmailAlreadyExist:
             return json_response.conflict()
         else:
-            return json_response.success(user)
+            return json_response.success(response)
 
 
 bp.add_url_rule('', view_func=UsersView.as_view('users'))
