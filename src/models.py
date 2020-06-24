@@ -34,13 +34,13 @@ class BaseModel:
     def get_by_id(self, id):
         return self.get_by_field(self.pk_name, id)
 
-    def create(self, attributes: dict, on_conflict: str = ''):
+    def create(self, attributes: dict):
         keys = attributes.keys()
         values = tuple(attributes.values())
         placeholder = ', '.join('?' for _ in values)
         fields_str = ', '.join(keys)
         query = f"""
-            INSERT {on_conflict} INTO `{self.table}` ({fields_str})
+            INSERT INTO `{self.table}` ({fields_str})
             VALUES ({placeholder})
         """
         try:
