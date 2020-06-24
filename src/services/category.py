@@ -25,13 +25,6 @@ class CategoryService(ModelService):
         except IntegrityError as e:
             raise CategoryAlreadyExist(str(e)) from e
 
-    def get_user_category_by_name(self, user_id, name):
-        name = str(name).lower()
-        category = self.model.get_user_category_by_name(user_id, name)
-        if category is None:
-            raise CategoryNotFound()
-        return category
-
     def get_user_category_by_id(self, user_id, category_id):
         category = self.model.get_user_category_by_id(user_id, category_id)
         if category is None:

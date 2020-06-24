@@ -112,9 +112,6 @@ class User(BaseModel):
 class Category(BaseModel):
     table = 'category'
 
-    def get_user_category_by_name(self, user_id, name):
-        return self.find_one(name=name, account_id=user_id)
-
     def get_user_category_by_id(self, user_id, category_id):
         return self.find_one(id=category_id, account_id=user_id)
 
