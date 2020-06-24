@@ -1,7 +1,6 @@
-from .base import ModelService, SchemaService
+from .base import ModelService
 from exceptions import ServiceError
 from models import User, IntegrityError
-from schemes import UserSchema
 
 
 class UserServiceError(ServiceError):
@@ -12,9 +11,8 @@ class EmailAlreadyExist(UserServiceError):
     pass
 
 
-class UserService(ModelService, SchemaService):
+class UserService(ModelService):
     model_class = User
-    schema_class = UserSchema
 
     def register(self, attributes: dict):
         try:
