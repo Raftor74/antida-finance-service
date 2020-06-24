@@ -28,6 +28,7 @@ class TransactionService(ModelService):
 
     def prepare_transaction_fields(self, transaction):
         transaction['sum'] = self._pennies_to_rubles(transaction['sum'])
+        transaction['date_time'] = self.formatting_date_time(transaction['date_time'])
         return transaction
 
     def update_transaction(self, user_id, transaction_id, attributes: dict):
@@ -58,9 +59,12 @@ class TransactionService(ModelService):
     def _make_transaction_fields(self, user_id, fields):
         fields['account_id'] = user_id
         if 'date_time' not in fields:
-            fields['date_time'] = datetime.now()
+            fields['date_time'] = datetime.now().isoformat()
         fields['sum'] = self._sum_to_pennies(fields['sum'])
         return fields
+
+    def _create_transaction(self, attributes: dict):
+        return self.model.create(attributes)
 
     @classmethod
     def _sum_to_pennies(cls, sum):
@@ -70,5 +74,6 @@ class TransactionService(ModelService):
     def _pennies_to_rubles(cls, pennies):
         return pennies / 100
 
-    def _create_transaction(self, attributes: dict):
-        return self.model.create(attributes)
+    @classmethod
+    def formatting_date_time(cls, date_time):
+        return datetime.fromisoformat(date_time)

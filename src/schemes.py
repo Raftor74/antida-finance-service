@@ -19,5 +19,5 @@ class TransactionSchema(Schema):
     type = fields.Integer()
     sum = fields.Decimal(as_string=True)
     description = fields.String()
-    date_time = fields.String()
+    date_time = fields.DateTime()
     category_id = fields.Integer()
