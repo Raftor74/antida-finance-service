@@ -1,29 +1,21 @@
 from flask.views import MethodView
 from builders import ServiceBuilder
-from services.auth import AuthService
-from services.users import UserService
-from services.category import CategoryService
-from services.transaction import TransactionService
 
 
 class ServiceView(MethodView):
     service_class = None
 
     def __init__(self):
+        super().__init__()
         self.service = ServiceBuilder(self.service_class).build()
 
 
-class AuthServiceView(ServiceView):
-    service_class = AuthService
+class SchemaView(MethodView):
+    schema_class = None
 
+    def __init__(self):
+        super().__init__()
+        self.schema = self.schema_class()
 
-class UserServiceView(ServiceView):
-    service_class = UserService
-
-
-class CategoryServiceView(ServiceView):
-    service_class = CategoryService
-
-
-class TransactionServiceView(ServiceView):
-    service_class = TransactionService
+    def schema_response(self, data):
+        return self.schema.dump(data)

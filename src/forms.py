@@ -23,13 +23,13 @@ class CreateCategoryForm(Schema):
     name = fields.String(required=True)
     parent_id = fields.Integer()
 
-    @validates("parent_id")
+    @validates('parent_id')
     def validate_parent_id(self, value):
         try:
             user_id = get_auth_user_id()
             is_category_owner(user_id, value)
         except CustomValidationError:
-            raise ValidationError("Родительская категория не найдена")
+            raise ValidationError('Родительская категория не найдена')
 
 
 class UpdateCategoryForm(CreateCategoryForm):
@@ -43,20 +43,20 @@ class CreateTransactionForm(Schema):
     category_id = fields.Integer()
     date_time = fields.DateTime()
 
-    @validates("category_id")
+    @validates('category_id')
     def validate_category_id(self, value):
         try:
             user_id = get_auth_user_id()
             is_category_owner(user_id, value)
         except CustomValidationError:
-            raise ValidationError("Категория не найдена")
+            raise ValidationError('Категория не найдена')
 
-    @validates("type")
+    @validates('type')
     def validate_type(self, value):
         try:
             is_valid_transaction_type(value)
         except CustomValidationError:
-            raise ValidationError("Передан не верный тип транзакции")
+            raise ValidationError('Передан не верный тип транзакции')
 
 
 class UpdateTransactionForm(CreateTransactionForm):
