@@ -53,6 +53,9 @@ class TransactionService(ModelService):
 
     @classmethod
     def validate_transaction_category(cls, user_id, category_id):
+        if category_id is None:
+            return
+
         service = ServiceBuilder(CategoryService).build()
         service.validate_category_on_exist(user_id, category_id)
 
