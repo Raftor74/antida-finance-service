@@ -56,6 +56,9 @@ class CategoryService(ModelService):
         self.get_user_category_by_id(user_id, category_id)
 
     def validate_parent_category_on_exist(self, user_id, category_id):
+        if category_id is None:
+            return
+
         try:
             self.get_user_category_by_id(user_id, category_id)
         except CategoryNotFound as e:
