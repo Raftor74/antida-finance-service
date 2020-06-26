@@ -15,7 +15,7 @@ class LoginForm(Schema):
 
 class CreateCategoryForm(Schema):
     name = fields.String(required=True)
-    parent_id = fields.Integer()
+    parent_id = fields.Integer(allow_none=True)
 
 
 class UpdateCategoryForm(CreateCategoryForm):
@@ -26,7 +26,7 @@ class CreateTransactionForm(Schema):
     type = fields.Integer(required=True)
     sum = fields.Float(required=True)
     description = fields.String()
-    category_id = fields.Integer()
+    category_id = fields.Integer(allow_none=True)
     date_time = fields.DateTime()
 
 
