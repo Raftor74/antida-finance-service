@@ -2,7 +2,12 @@ from flask import Blueprint
 
 from forms import create_transaction_form, update_transaction_form
 from middleware.wraps import validate, auth_required
-from services.transaction import TransactionService, TransactionNotFound
+from services.category import CategoryNotFound
+from services.transaction import (
+    TransactionService,
+    TransactionNotFound,
+    InvalidTransactionType
+)
 from schemes import TransactionSchema
 from utils.response import json_response
 from views import ServiceView, SchemaView
@@ -20,10 +25,16 @@ class TransactionsView(TransactionServiceView):
     @validate(schema=create_transaction_form)
     def post(self, form, user):
         user_id = user.get('id')
-        transaction_id = self.service.create(user_id, form)
-        transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
-        response = self.schema_response(transaction)
-        return json_response.success(response)
+        try:
+            transaction_id = self.service.create(user_id, form)
+            transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
+            response = self.schema_response(transaction)
+        except InvalidTransactionType:
+            return json_response.bad_request({'type': 'Передан неверный тип транзакции'})
+        except CategoryNotFound:
+            return json_response.bad_request({'category_id': 'Категория транзакции не существует'})
+        else:
+            return json_response.success(response)
 
     @auth_required
     def get(self, user):
@@ -58,6 +69,10 @@ class TransactionView(TransactionServiceView):
             response = self.schema_response(transaction)
         except TransactionNotFound:
             return json_response.not_found()
+        except InvalidTransactionType:
+            return json_response.bad_request({'type': 'Передан неверный тип транзакции'})
+        except CategoryNotFound:
+            return json_response.bad_request({'category_id': 'Категория транзакции не существует'})
         else:
             return json_response.success(response)
 
