@@ -112,6 +112,25 @@ class User(BaseModel):
 class Category(BaseModel):
     table = 'category'
 
+    def get_subcategories(self, category_id, select: list = None):
+        category = self.get_by_id(category_id)
+        if category is None:
+            return []
+
+        select_fields = select if select is not None else ['*']
+        select_placeholder = ','.join(select_fields)
+        m_path = category['path']
+        query = f"""
+            SELECT {select_placeholder} 
+            FROM {self.table}
+            WHERE path LIKE '{m_path}%'
+            AND id != ?
+            ORDER BY path
+        """
+        values = (category_id,)
+        result = self.connection.execute(query, values)
+        return [dict(row) for row in result]
+
     def get_user_category_by_id(self, user_id, category_id):
         return self.find_one(id=category_id, account_id=user_id)
 
