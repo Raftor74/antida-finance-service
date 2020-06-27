@@ -1,6 +1,7 @@
 import sqlite3
 
 from werkzeug.security import check_password_hash, generate_password_hash
+from queries.base import Query
 
 
 class IntegrityError(Exception):
@@ -112,6 +113,23 @@ class User(BaseModel):
 class Category(BaseModel):
     table = 'category'
 
+    def get_parent_categories(self, category_id, select: list = None):
+        category = self.get_by_id(category_id)
+        if category is None:
+            return []
+        select_fields = select if select is not None else ['*']
+        select_fields = list(map(lambda x: 't1.' + str(x), select_fields))
+        select_placeholder = ','.join(select_fields)
+        query = f"""
+            SELECT {select_placeholder} 
+            FROM {self.table} t1, {self.table} t2
+            WHERE t2.path LIKE (t1.path || '%')
+            AND t2.id = ?
+        """
+        values = (category_id,)
+        result = self.connection.execute(query, values).fetchall()
+        return [dict(row) for row in result]
+
     def get_subcategories(self, category_id, select: list = None):
         category = self.get_by_id(category_id)
         if category is None:
@@ -128,7 +146,7 @@ class Category(BaseModel):
             ORDER BY path
         """
         values = (category_id,)
-        result = self.connection.execute(query, values)
+        result = self.connection.execute(query, values).fetchall()
         return [dict(row) for row in result]
 
     def get_user_category_by_id(self, user_id, category_id):
@@ -150,3 +168,15 @@ class Transaction(BaseModel):
 
     def get_transactions_by_user(self, user_id):
         return self.find_many(account_id=user_id)
+
+    def find_by_query_one(self, query: Query):
+        result = self._find_by_query(query).fetchone()
+        return dict(result) if result is not None else None
+
+    def find_by_query_many(self, query: Query):
+        result = self._find_by_query(query).fetchall()
+        return [dict(row) for row in result]
+
+    def _find_by_query(self, query: Query):
+        sql_query, values = query.build()
+        return self.connection.execute(sql_query, values)

@@ -5,6 +5,7 @@ from .category import CategoryService
 from builders import ServiceBuilder
 from exceptions import ServiceError
 from models import Transaction
+from queries.transaction import TransactionQuery
 
 
 class TransactionServiceError(ServiceError):
@@ -38,6 +39,7 @@ class TransactionService(ModelService):
     def prepare_transaction_fields(self, transaction):
         transaction['sum'] = self._pennies_to_rubles(transaction['sum'])
         transaction['date_time'] = self.formatting_date_time(transaction['date_time'])
+        transaction['categories'] = self.get_transaction_categories(transaction['category_id'])
         return transaction
 
     def update_transaction(self, user_id, transaction_id, attributes: dict):
@@ -68,14 +70,28 @@ class TransactionService(ModelService):
         self.validate_transaction_on_exist(user_id, transaction_id)
         return self.model.delete(transaction_id)
 
-    def get_user_transactions(self, user_id):
+    def get_user_transactions(self, user_id, filter: dict, limit: int = None, offset: int = None):
+        query = TransactionQuery().set_filter(user_id, filter) \
+            .limit(limit) \
+            .offset(offset).order('date_time', 'DESC')
         return (
             self.prepare_transaction_fields(transaction)
-            for transaction in self.model.get_transactions_by_user(user_id)
+            for transaction in self.model.find_by_query_many(query)
         )
+
+    def get_user_transactions_count(self, user_id, filter):
+        query = TransactionQuery().set_filter(user_id, filter) \
+            .select(['COUNT(id) AS CNT'])
+        count = self.model.find_by_query_one(query)
+        return count.get('CNT') if count is not None else 0
 
     def get_transaction_type(self, type_id):
         return self.model.TRANSACTION_TYPES.get(type_id)
+
+    @classmethod
+    def get_transaction_categories(cls, category_id):
+        category_service = ServiceBuilder(CategoryService).build()
+        return category_service.get_parent_categories(category_id)
 
     def _make_transaction_fields(self, user_id, fields):
         fields['account_id'] = user_id
