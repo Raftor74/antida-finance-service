@@ -24,6 +24,22 @@ def validate(schema):
     return decorator
 
 
+def validate_query_args(schema):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(*args, **kwargs):
+            query_args = dict(request.args)
+            try:
+                form = schema.load(query_args)
+            except ValidationError as e:
+                return json_response.bad_request(e.messages)
+            return view_func(*args, **kwargs, form=form)
+
+        return wrapper
+
+    return decorator
+
+
 def auth_required(view_func):
     @wraps(view_func)
     def wrapper(*args, **kwargs):

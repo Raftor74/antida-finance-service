@@ -14,6 +14,11 @@ class CategorySchema(Schema):
     parent_id = fields.Integer()
 
 
+class TransactionCategorySchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
 class TransactionSchema(Schema):
     id = fields.Integer()
     type = fields.Integer()
@@ -21,3 +26,4 @@ class TransactionSchema(Schema):
     description = fields.String()
     date_time = fields.DateTime()
     category_id = fields.Integer()
+    categories = fields.List(fields.Nested(TransactionCategorySchema))
