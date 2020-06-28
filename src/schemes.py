@@ -17,7 +17,7 @@ class CategorySchema(Schema):
 class TransactionSchema(Schema):
     id = fields.Integer(required=True)
     type = fields.Integer(required=True)
-    sum = fields.Decimal(as_string=True)
+    sum = fields.Decimal(as_string=True, required=True)
     description = fields.String()
-    date_time = fields.DateTime()
+    date_time = fields.DateTime(required=True)
     category_id = fields.Integer()
