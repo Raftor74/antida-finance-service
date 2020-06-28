@@ -22,7 +22,6 @@ CREATE INDEX cp_idx ON category (`path`);
 
 CREATE TRIGGER category__ai_path_set AFTER INSERT ON category
 BEGIN
-    -- Вычисление материализованного пути.
     UPDATE category
         SET path =
             CASE
@@ -38,7 +37,6 @@ END;
 
 CREATE TRIGGER category__bd_category_remove BEFORE DELETE ON category
 BEGIN
-    -- Удалить всех потомков.
     DELETE FROM category
     WHERE path LIKE OLD.path || '_%';
 END;
@@ -47,8 +45,8 @@ CREATE TRIGGER category__bu_integrity_check BEFORE UPDATE OF id, path ON categor
 BEGIN
     SELECT
         CASE
-            WHEN OLD.id != NEW.id -- Смена id?
-                OR NEW.parent_id IS OLD.id -- Ссылка на самого себя как на предка?
+            WHEN OLD.id != NEW.id
+                OR NEW.parent_id IS OLD.id
                 OR NEW.path !=
                     CASE
                         WHEN NEW.parent_id IS NULL THEN '.' || OLD.id || '.'
@@ -57,8 +55,8 @@ BEGIN
                                 FROM category
                                 WHERE id = NEW.parent_id
                             )
-                    END -- Материализованный путь не соответствует рассчетному?
-                OR NEW.path LIKE '%.' || OLD.id || '._%' -- Закольцовка пути?
+                    END
+                OR NEW.path LIKE '%.' || OLD.id || '._%'
                     THEN RAISE(ABORT, 'An attempt to damage the integrity of the category.')
         END;
 END;
@@ -67,10 +65,9 @@ CREATE TRIGGER category__au_path_update AFTER UPDATE OF parent_id ON category
 BEGIN
     SELECT
         CASE
-            WHEN NEW.parent_id IS OLD.id -- Ссылка на самого себя?
+            WHEN NEW.parent_id IS OLD.id
                     THEN RAISE(ABORT, 'An attempt to damage the integrity of the category.')
         END;
-    -- Массовое обновление материализованного пути у текущей строки и у всех потомков.
     UPDATE category
         SET path = REPLACE(
                 path,

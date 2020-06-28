@@ -38,6 +38,12 @@ class CategoryService(ModelService):
             raise CategoryNotFound()
         return category
 
+    def get_subcategories(self, category_id, select: list = None):
+        return self.model.get_subcategories(category_id, select)
+
+    def get_parent_categories(self, category_id, select: list = None):
+        return self.model.get_parent_categories(category_id, select)
+
     def get_user_categories(self, user_id):
         return self.model.get_categories_by_user(user_id)
 

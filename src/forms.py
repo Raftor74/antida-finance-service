@@ -35,9 +35,19 @@ class UpdateTransactionForm(CreateTransactionForm):
     sum = fields.Float()
 
 
+class FilterTransactionForm(Schema):
+    limit = fields.Integer()
+    offset = fields.Integer()
+    category = fields.Integer()
+    datetime = fields.String()
+    datetime_from = fields.DateTime()
+    datetime_to = fields.DateTime()
+
+
 register_form = RegisterForm(unknown=EXCLUDE)
 login_form = LoginForm(unknown=EXCLUDE)
 create_category_form = CreateCategoryForm(unknown=EXCLUDE)
 update_category_form = UpdateCategoryForm(unknown=EXCLUDE)
 create_transaction_form = CreateTransactionForm(unknown=EXCLUDE)
 update_transaction_form = UpdateTransactionForm(unknown=EXCLUDE)
+filter_transaction_form = FilterTransactionForm(unknown=EXCLUDE)
