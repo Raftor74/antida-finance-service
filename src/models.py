@@ -1,5 +1,6 @@
 import sqlite3
 
+from enum import IntEnum
 from werkzeug.security import check_password_hash, generate_password_hash
 from queries.base import Query
 
@@ -156,12 +157,17 @@ class Category(BaseModel):
         return self.find_many(account_id=user_id)
 
 
+class TransactionTypes(IntEnum):
+    INCOME = 1
+    EXPENSE = 2
+
+    @staticmethod
+    def list():
+        return list(map(lambda c: int(c.value), TransactionTypes))
+
+
 class Transaction(BaseModel):
     table = 'transaction'
-    TRANSACTION_TYPES = {
-        1: 'Доход',
-        2: 'Расход'
-    }
 
     def get_user_transaction_by_id(self, user_id, transaction_id):
         return self.find_one(account_id=user_id, id=transaction_id)

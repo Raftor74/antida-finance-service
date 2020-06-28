@@ -1,7 +1,11 @@
 from flask import Blueprint, request
 
-from forms import create_transaction_form, update_transaction_form
-from middleware.wraps import validate, auth_required
+from forms import (
+    create_transaction_form,
+    update_transaction_form,
+    filter_transaction_form
+)
+from middleware.wraps import auth_required, validate, validate_query_args
 from services.category import CategoryNotFound
 from services.transaction import (
     TransactionService,
@@ -37,13 +41,14 @@ class TransactionsView(TransactionServiceView):
             return json_response.success(response)
 
     @auth_required
-    def get(self, user):
+    @validate_query_args(schema=filter_transaction_form)
+    def get(self, user, form):
         user_id = user.get('id')
-        query_args = dict(request.args)
-        limit = query_args.get('limit', 20)
-        offset = query_args.get('offset', 0)
-        transactions = self.service.get_user_transactions(user_id, query_args, limit, offset)
-        total = self.service.get_user_transactions_count(user_id, query_args)
+        limit = form.get('limit', 20)
+        offset = form.get('offset', 0)
+        transactions = self.service.get_user_transactions(user_id, form, limit, offset)
+        count = self.service.get_user_transactions_count_rows(user_id, form)
+        total = self.service.get_user_transactions_total(user_id, form)
         schema_transactions = [
             self.schema_response(transaction)
             for transaction in transactions
@@ -52,7 +57,8 @@ class TransactionsView(TransactionServiceView):
             'data': schema_transactions,
             'limit': limit,
             'offset': offset,
-            'total': total,
+            'count': count,
+            'total': total
         }
         return json_response.success(response)
 
