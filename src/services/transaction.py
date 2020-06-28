@@ -73,7 +73,8 @@ class TransactionService(ModelService):
     def get_user_transactions(self, user_id, filter: dict, limit: int = None, offset: int = None):
         query = TransactionQueryBuilder().set_filter(user_id, filter) \
             .limit(limit) \
-            .offset(offset).order('date_time', 'DESC')
+            .offset(offset)\
+            .order('date_time', 'DESC')
         return (
             self.prepare_transaction_fields(transaction)
             for transaction in self.model.find_by_query_many(query)
