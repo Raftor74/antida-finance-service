@@ -2,7 +2,7 @@ import sqlite3
 
 from enum import IntEnum
 from werkzeug.security import check_password_hash, generate_password_hash
-from queries.base import Query
+from queries.base import QueryBuilder
 
 
 class IntegrityError(Exception):
@@ -175,14 +175,14 @@ class Transaction(BaseModel):
     def get_transactions_by_user(self, user_id):
         return self.find_many(account_id=user_id)
 
-    def find_by_query_one(self, query: Query):
+    def find_by_query_one(self, query: QueryBuilder):
         result = self._find_by_query(query).fetchone()
         return dict(result) if result is not None else None
 
-    def find_by_query_many(self, query: Query):
+    def find_by_query_many(self, query: QueryBuilder):
         result = self._find_by_query(query).fetchall()
         return [dict(row) for row in result]
 
-    def _find_by_query(self, query: Query):
+    def _find_by_query(self, query: QueryBuilder):
         sql_query, values = query.build()
         return self.connection.execute(sql_query, values)

@@ -5,7 +5,7 @@ from .category import CategoryService
 from builders import ServiceBuilder
 from exceptions import ServiceError
 from models import Transaction, TransactionTypes
-from queries.transaction import TransactionQuery
+from queries.transaction import TransactionQueryBuilder
 
 
 class TransactionServiceError(ServiceError):
@@ -71,7 +71,7 @@ class TransactionService(ModelService):
         return self.model.delete(transaction_id)
 
     def get_user_transactions(self, user_id, filter: dict, limit: int = None, offset: int = None):
-        query = TransactionQuery().set_filter(user_id, filter) \
+        query = TransactionQueryBuilder().set_filter(user_id, filter) \
             .limit(limit) \
             .offset(offset).order('date_time', 'DESC')
         return (
@@ -80,7 +80,7 @@ class TransactionService(ModelService):
         )
 
     def get_user_transactions_count_rows(self, user_id, filter):
-        query = TransactionQuery().set_filter(user_id, filter) \
+        query = TransactionQueryBuilder().set_filter(user_id, filter) \
             .select(['COUNT(id) AS CNT'])
         result = self.model.find_by_query_one(query)
         count = result.get('CNT') if result is not None else 0
@@ -100,7 +100,7 @@ class TransactionService(ModelService):
         return category_service.get_parent_categories(category_id)
 
     def _get_user_transactions_subtotal(self, user_id, filter, type_id):
-        query = TransactionQuery().set_filter(user_id, filter)\
+        query = TransactionQueryBuilder().set_filter(user_id, filter)\
             .where('type', type_id) \
             .select(['SUM(sum) AS SUM'])
         result = self.model.find_by_query_one(query)

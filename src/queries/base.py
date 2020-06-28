@@ -1,4 +1,4 @@
-class Query:
+class QueryBuilder:
     table_name = None
 
     def __init__(self):
