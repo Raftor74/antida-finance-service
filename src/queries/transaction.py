@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import rrule, MONTHLY
 
 from .base import QueryBuilder
 from builders import ServiceBuilder
@@ -11,8 +13,8 @@ class TransactionQueryBuilder(QueryBuilder):
 
     def set_filter(self, user_id, query_filter: dict):
         self.filter_by_user(user_id) \
-            .filter_by_category(query_filter)\
-            .filter_by_datetime_range(query_filter)\
+            .filter_by_category(query_filter) \
+            .filter_by_datetime_range(query_filter) \
             .filter_by_datetime(query_filter)
         return self
 
@@ -26,7 +28,22 @@ class TransactionQueryBuilder(QueryBuilder):
 
         current_date = datetime.today().date()
         current_week_start = current_date - timedelta(days=current_date.weekday() % 7)
-        current_week_end = current_week_start + timedelta(days=7)
+        current_week_end = current_week_start + relativedelta(weeks=1)
+        current_month_start = current_date + relativedelta(day=1)
+        current_month_end = current_month_start + relativedelta(months=1)
+        current_year_start = current_date + relativedelta(month=1, day=1)
+        current_year_end = current_year_start + relativedelta(years=1)
+
+        current_quarter_start = rrule(
+            MONTHLY,
+            bymonth=(1, 4, 7, 10),
+            bysetpos=-1,
+            dtstart=datetime(current_date.year, 1, 1),
+            count=8
+        )
+        current_quarter_first_day = current_quarter_start.before(datetime.now())
+        current_quarter_last_day = current_quarter_start.after(datetime.now())
+        previous_quarter_first_day = current_quarter_first_day - relativedelta(months=3)
 
         if datetime_code == 'current_week':
             self.where('date_time', current_week_start, '>=')
@@ -36,8 +53,26 @@ class TransactionQueryBuilder(QueryBuilder):
             last_week_end = last_week_start + timedelta(days=7)
             self.where('date_time', last_week_start, '>=')
             self.where('date_time', last_week_end, '<')
-            
-        # TODO: реализовать остальные подстановки
+        elif datetime_code == 'current_month':
+            self.where('date_time', current_month_start, '>=')
+            self.where('date_time', current_month_end, '<')
+        elif datetime_code == 'last_month':
+            last_month_start = current_month_start - relativedelta(months=1)
+            self.where('date_time', last_month_start, '>=')
+            self.where('date_time', current_month_start, '<')
+        elif datetime_code == 'current_quarter':
+            self.where('date_time', current_quarter_first_day, '>=')
+            self.where('date_time', current_quarter_last_day, '<')
+        elif datetime_code == 'previous_quarter':
+            self.where('date_time', previous_quarter_first_day, '>=')
+            self.where('date_time', current_quarter_first_day, '<')
+        elif datetime_code == 'current_year':
+            self.where('date_time', current_year_start, '>=')
+            self.where('date_time', current_year_end, '<')
+        elif datetime_code == 'last_year':
+            last_year_start = current_year_start - relativedelta(years=1)
+            self.where('date_time', last_year_start, '>=')
+            self.where('date_time', current_year_start, '<')
 
         return self
 
@@ -62,4 +97,3 @@ class TransactionQueryBuilder(QueryBuilder):
         if datetime_to:
             self.where('date_time', datetime_to, '<=')
         return self
-
