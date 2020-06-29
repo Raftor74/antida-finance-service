@@ -598,76 +598,6 @@
 			"response": []
 		},
 		{
-			"name": "Получение всех категорий пользователя (УСПЕХ) ",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"type\": 1 ,\r\n  \"sum\": 90000.00,\r\n  \"description\": \"Купили квартиру\",\r\n  \"category_id\": 31\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/categories",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"categories"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Получение категории пользователя по ее id (УСПЕХ) ",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/categories/2/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"categories",
-						"2",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Редактирование категории (УСПЕХ) Смена названия категории",
 			"request": {
 				"method": "PATCH",
@@ -866,7 +796,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 970.33,\r\n  \"description\": \"Купили несколько упаковок сока Rich\",\r\n  \"category_id\": 9,\r\n  \"date_time\": \"2020-05-31 23:59\"\r\n}",
+					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 970.33,\r\n  \"description\": \"Купили несколько упаковок сока Rich\",\r\n  \"category_id\": 8,\r\n  \"date_time\": \"2020-05-31 23:59\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -897,7 +827,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 2970.33,\r\n  \"description\": \"Купили пару коробок сока Rich\",\r\n  \"category_id\": 9,\r\n  \"date_time\": \"2020-05-15 23:59\"\r\n}",
+					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 2970.33,\r\n  \"description\": \"Купили пару коробок сока Rich\",\r\n  \"category_id\": 8,\r\n  \"date_time\": \"2020-05-15 23:59\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1449,7 +1379,7 @@
 			"response": []
 		},
 		{
-			"name": "Создание транзакции # 23 (УСПЕХ) Не передали в необязательное поле description. Поле category_id = null",
+			"name": "Создание транзакции # 23 (УСПЕХ) Не передали необязательное поле description. Поле category_id = null",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -1728,6 +1658,272 @@
 			"response": []
 		},
 		{
+			"name": "Получение транзакций которые относятся к конкретной категории и ее подкатегориям по указанному id (УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions?category=2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "category",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение транзакций которые относятся к конкретной категории и ее подкатегориям по указанному произвольному промежутку времени (УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions?datetime_from=2020-05-16T10:45&datetime_to=2020-06-29T10:45",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "datetime_from",
+							"value": "2020-05-16T10:45"
+						},
+						{
+							"key": "datetime_to",
+							"value": "2020-06-29T10:45"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение всех транзакций пользователя с категориями и подкатегорями к которым они относятся (УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение всех транзакций пользователя с категориями и подкатегорями к которым они относятся с учетом заданной пагинации (УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions?limit=3&offset=3",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение всех транзакций пользователя по id категории с учетом заданной пагинации (УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions?limit=3&offset=3&category=8",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "3"
+						},
+						{
+							"key": "category",
+							"value": "8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение всех транзакций пользователя по id категории с учетом заданной пагинации и заданного промежутка времени(УСПЕХ)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions?limit=2&offset=0&category=8&datetime_from=2020-06-16T10:45&datetime_to=2020-06-29T10:45",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "category",
+							"value": "8"
+						},
+						{
+							"key": "datetime_from",
+							"value": "2020-06-16T10:45"
+						},
+						{
+							"key": "datetime_to",
+							"value": "2020-06-29T10:45"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Получение транзакции пользователя по ее id (УСПЕХ)",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -1792,40 +1988,6 @@
 					"path": [
 						"transactions",
 						"450"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Получение всех транзакций пользователя (УСПЕХ)",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/transactions",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"transactions"
 					]
 				}
 			},
@@ -2110,6 +2272,39 @@
 			"response": []
 		},
 		{
+			"name": "Редактирование транзакции (УСПЕХ) Указаны все поля",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 404.15,\r\n  \"description\": \"Купили пару упаковок сока Добрый\",\r\n  \"category_id\": 9,\r\n  \"date_time\": \"2020-06-30 23:59\"\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions/26/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions",
+						"26",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Редактирование транзакции (УСПЕХ) Не указано обязательное поле type",
 			"request": {
 				"method": "PATCH",
@@ -2136,39 +2331,6 @@
 					"path": [
 						"transactions",
 						"11",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Редактирование транзакции (УСПЕХ) Указаны все поля",
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 404.15,\r\n  \"description\": \"Купили пару упаковок сока Добрый\",\r\n  \"category_id\": 9,\r\n  \"date_time\": \"2020-05-30 23:59\"\r\n}\r\n\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/transactions/26/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"transactions",
-						"26",
 						""
 					]
 				}
@@ -2322,7 +2484,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5000/transactions/26/",
+					"raw": "http://127.0.0.1:5000/transactions/27/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -2333,7 +2495,7 @@
 					"port": "5000",
 					"path": [
 						"transactions",
-						"26",
+						"27",
 						""
 					]
 				}
@@ -2347,7 +2509,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"type\": 2 ,\r\n  \"sum\": 4500456.15,\r\n  \"description\": \"Продали квартиру\",\r\n  \"category_id\": 31,\r\n  \"date_time\": \"2020-06-21 20:05\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2355,7 +2517,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5000/categories/2/",
+					"raw": "http://127.0.0.1:5000/categories/8/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -2366,7 +2528,7 @@
 					"port": "5000",
 					"path": [
 						"categories",
-						"2",
+						"8",
 						""
 					]
 				}
