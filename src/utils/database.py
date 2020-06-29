@@ -15,6 +15,7 @@ class SqliteDB:
     @property
     def connection(self):
         self._connect()
+        self._connection.execute('PRAGMA foreign_keys=on;')
         return self._connection
 
     def _connect(self):
