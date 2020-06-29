@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "562f4cf6-688e-4126-8c75-3d10dcacd05f",
+		"_postman_id": "2a2927e1-9891-4d88-8c54-058f1bcedbd2",
 		"name": "antida finance service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1658,6 +1658,63 @@
 			"response": []
 		},
 		{
+			"name": "Получение списка всех категорий (УСПЕХ)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/categories",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение категории пользователя по ее id (НЕУДАЧА). У пользователя нет категории с таким id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/transactions/450",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"transactions",
+						"450"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Получение транзакций которые относятся к конкретной категории и ее подкатегориям по указанному id (УСПЕХ)",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -1953,41 +2010,6 @@
 					"path": [
 						"transactions",
 						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Получение категории пользователя по ее id (НЕУДАЧА). У пользователя нет категории с таким id",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/transactions/450",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"transactions",
-						"450"
 					]
 				}
 			},
