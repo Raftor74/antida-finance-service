@@ -2,7 +2,12 @@ from flask import Blueprint
 
 from forms import create_category_form, update_category_form
 from middleware.wraps import validate, auth_required
-from services.category import CategoryService, CategoryNotFound, CategoryAlreadyExist
+from services.category import (
+    CategoryService,
+    CategoryNotFound,
+    CategoryAlreadyExist,
+    ParentCategoryNotFound
+)
 from schemes import CategorySchema
 from utils.response import json_response
 from views import ServiceView, SchemaView
@@ -18,14 +23,16 @@ class CategoryServiceView(ServiceView, SchemaView):
 class CategoriesView(CategoryServiceView):
     @auth_required
     @validate(schema=create_category_form)
-    def post(self, form, user):
+    def post(self, user, form):
         user_id = user.get('id')
         try:
-            category_id = self.service.create(user_id, **form)
+            category_id = self.service.create(user_id, form)
             category = self.service.get_user_category_by_id(user_id, category_id)
             response = self.schema_response(category)
         except CategoryAlreadyExist:
             return json_response.conflict()
+        except ParentCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 
@@ -64,6 +71,8 @@ class CategoryView(CategoryServiceView):
             return json_response.conflict()
         except CategoryNotFound:
             return json_response.not_found()
+        except ParentCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 

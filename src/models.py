@@ -1,6 +1,8 @@
 import sqlite3
 
+from enum import IntEnum
 from werkzeug.security import check_password_hash, generate_password_hash
+from queries.base import QueryBuilder
 
 
 class IntegrityError(Exception):
@@ -112,6 +114,42 @@ class User(BaseModel):
 class Category(BaseModel):
     table = 'category'
 
+    def get_parent_categories(self, category_id, select: list = None):
+        category = self.get_by_id(category_id)
+        if category is None:
+            return []
+        select_fields = select if select is not None else ['*']
+        select_fields = list(map(lambda x: 't1.' + str(x), select_fields))
+        select_placeholder = ','.join(select_fields)
+        query = f"""
+            SELECT {select_placeholder} 
+            FROM {self.table} t1, {self.table} t2
+            WHERE t2.path LIKE (t1.path || '%')
+            AND t2.id = ?
+        """
+        values = (category_id,)
+        result = self.connection.execute(query, values).fetchall()
+        return [dict(row) for row in result]
+
+    def get_subcategories(self, category_id, select: list = None):
+        category = self.get_by_id(category_id)
+        if category is None:
+            return []
+
+        select_fields = select if select is not None else ['*']
+        select_placeholder = ','.join(select_fields)
+        m_path = category['path']
+        query = f"""
+            SELECT {select_placeholder} 
+            FROM {self.table}
+            WHERE path LIKE '{m_path}%'
+            AND id != ?
+            ORDER BY path
+        """
+        values = (category_id,)
+        result = self.connection.execute(query, values).fetchall()
+        return [dict(row) for row in result]
+
     def get_user_category_by_id(self, user_id, category_id):
         return self.find_one(id=category_id, account_id=user_id)
 
@@ -119,15 +157,32 @@ class Category(BaseModel):
         return self.find_many(account_id=user_id)
 
 
+class TransactionTypes(IntEnum):
+    INCOME = 1
+    EXPENSE = 2
+
+    @staticmethod
+    def list():
+        return list(map(lambda c: int(c.value), TransactionTypes))
+
+
 class Transaction(BaseModel):
     table = 'transaction'
-    TRANSACTION_TYPES = {
-        1: 'Доход',
-        2: 'Расход'
-    }
 
     def get_user_transaction_by_id(self, user_id, transaction_id):
         return self.find_one(account_id=user_id, id=transaction_id)
 
     def get_transactions_by_user(self, user_id):
         return self.find_many(account_id=user_id)
+
+    def find_by_query_one(self, query: QueryBuilder):
+        result = self._find_by_query(query).fetchone()
+        return dict(result) if result is not None else None
+
+    def find_by_query_many(self, query: QueryBuilder):
+        result = self._find_by_query(query).fetchall()
+        return [dict(row) for row in result]
+
+    def _find_by_query(self, query: QueryBuilder):
+        sql_query, values = query.build()
+        return self.connection.execute(sql_query, values)
