@@ -31,8 +31,8 @@ class CategoriesView(CategoryServiceView):
             response = self.schema_response(category)
         except CategoryAlreadyExist:
             return json_response.conflict()
-        except ParentCategoryNotFound:
-            return json_response.bad_request({'parent_id': "Родительская категория не найдена"})
+        except ParentCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 
@@ -71,8 +71,8 @@ class CategoryView(CategoryServiceView):
             return json_response.conflict()
         except CategoryNotFound:
             return json_response.not_found()
-        except ParentCategoryNotFound:
-            return json_response.bad_request({'parent_id': "Родительская категория не найдена"})
+        except ParentCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 

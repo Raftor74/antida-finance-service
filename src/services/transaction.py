@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from .base import ModelService
-from .category import CategoryService
+from .category import CategoryService, CategoryNotFound
 from builders import ServiceBuilder
 from exceptions import ServiceError
 from models import Transaction, TransactionTypes
@@ -13,6 +13,10 @@ class TransactionServiceError(ServiceError):
 
 
 class TransactionNotFound(TransactionServiceError):
+    pass
+
+
+class TransactionCategoryNotFound(TransactionServiceError):
     pass
 
 
@@ -57,14 +61,22 @@ class TransactionService(ModelService):
     def validate_transaction_category(cls, user_id, category_id):
         if category_id is None:
             return
-
-        service = ServiceBuilder(CategoryService).build()
-        service.validate_category_on_exist(user_id, category_id)
+        try:
+            service = ServiceBuilder(CategoryService).build()
+            service.validate_category_on_exist(user_id, category_id)
+        except CategoryNotFound:
+            raise TransactionCategoryNotFound(
+                field_name='category_id',
+                field_error='Категория транзакции не найдена'
+            )
 
     @classmethod
     def validate_transaction_type(cls, type_id):
         if type_id not in TransactionTypes.list():
-            raise InvalidTransactionType()
+            raise InvalidTransactionType(
+                field_name='type',
+                field_error='Передан неверный тип транзакции'
+            )
 
     def delete_transaction(self, user_id, transaction_id):
         self.validate_transaction_on_exist(user_id, transaction_id)
@@ -73,7 +85,7 @@ class TransactionService(ModelService):
     def get_user_transactions(self, user_id, filter: dict, limit: int = None, offset: int = None):
         query = TransactionQueryBuilder().set_filter(user_id, filter) \
             .limit(limit) \
-            .offset(offset)\
+            .offset(offset) \
             .order('date_time', 'DESC')
         return (
             self.prepare_transaction_fields(transaction)
@@ -101,7 +113,7 @@ class TransactionService(ModelService):
         return category_service.get_parent_categories(category_id)
 
     def _get_user_transactions_subtotal(self, user_id, filter, type_id):
-        query = TransactionQueryBuilder().set_filter(user_id, filter)\
+        query = TransactionQueryBuilder().set_filter(user_id, filter) \
             .where('type', type_id) \
             .select(['SUM(sum) AS SUM'])
         result = self.model.find_by_query_one(query)
