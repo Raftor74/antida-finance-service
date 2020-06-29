@@ -6,10 +6,10 @@ from forms import (
     filter_transaction_form
 )
 from middleware.wraps import auth_required, validate, validate_query_args
-from services.category import CategoryNotFound
 from services.transaction import (
     TransactionService,
     TransactionNotFound,
+    TransactionCategoryNotFound,
     InvalidTransactionType
 )
 from schemes import TransactionSchema
@@ -33,10 +33,10 @@ class TransactionsView(TransactionServiceView):
             transaction_id = self.service.create(user_id, form)
             transaction = self.service.get_user_transaction_by_id(user_id, transaction_id)
             response = self.schema_response(transaction)
-        except InvalidTransactionType:
-            return json_response.bad_request({'type': 'Передан неверный тип транзакции'})
-        except CategoryNotFound:
-            return json_response.bad_request({'category_id': 'Категория транзакции не существует'})
+        except InvalidTransactionType as e:
+            return json_response.bad_request(e.get_error_message())
+        except TransactionCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 
@@ -85,10 +85,10 @@ class TransactionView(TransactionServiceView):
             response = self.schema_response(transaction)
         except TransactionNotFound:
             return json_response.not_found()
-        except InvalidTransactionType:
-            return json_response.bad_request({'type': 'Передан неверный тип транзакции'})
-        except CategoryNotFound:
-            return json_response.bad_request({'category_id': 'Категория транзакции не существует'})
+        except InvalidTransactionType as e:
+            return json_response.bad_request(e.get_error_message())
+        except TransactionCategoryNotFound as e:
+            return json_response.bad_request(e.get_error_message())
         else:
             return json_response.success(response)
 

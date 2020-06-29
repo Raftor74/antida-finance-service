@@ -68,7 +68,10 @@ class CategoryService(ModelService):
         try:
             self.get_user_category_by_id(user_id, category_id)
         except CategoryNotFound as e:
-            raise ParentCategoryNotFound(str(e)) from e
+            raise ParentCategoryNotFound(
+                field_name='parent_id',
+                field_error='Родительская категория не найдена'
+            ) from e
 
     def delete_category(self, user_id, category_id):
         self.validate_category_on_exist(user_id, category_id)
